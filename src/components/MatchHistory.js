@@ -18,7 +18,7 @@ const MatchHistory = (props) => {
     };
     var config = {
       method: "post",
-      url: "http://localhost:4000/getuserhistory",
+      url: "https://valtrackerbe.herokuapp.com/getuserhistory",
       headers: {
         "Content-Type": "application/json",
       },

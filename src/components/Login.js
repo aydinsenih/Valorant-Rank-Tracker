@@ -23,7 +23,7 @@ const Login = (props) => {
     };
     var config = {
       method: "post",
-      url: "http://localhost:4000/getuserinfo",
+      url: "https://valtrackerbe.herokuapp.com/getuserinfo",
       headers: {
         "Content-Type": "application/json",
       },
