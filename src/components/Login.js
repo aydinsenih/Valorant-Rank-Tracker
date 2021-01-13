@@ -33,6 +33,7 @@ const Login = (props) => {
     axios(config)
       .then((res) => {
         setUserData(res.data.response);
+        console.log(res.data.response);
         localStorage.setItem("user_token", res.data.response.user_token);
         localStorage.setItem(
           "entitlements_token",

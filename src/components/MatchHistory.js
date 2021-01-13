@@ -27,6 +27,7 @@ const MatchHistory = (props) => {
 
     axios(config)
       .then((response) => {
+        console.log(response);
         setMatchData(
           response.data.data.Matches.filter(
             (match) => match.CompetitiveMovement !== "MOVEMENT_UNKNOWN"
