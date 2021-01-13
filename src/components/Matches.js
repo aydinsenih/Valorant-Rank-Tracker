@@ -14,42 +14,42 @@ const Matches = (props) => {
     return <div>waiting for match data</div>;
   }
   let assetsPath = require.context("../images", true, /\.(png|jpe?g|svg)$/);
-  const img_node = assetsPath("./TX_CompetitiveTier_Large_24.png");
-  console.log(img_node);
+  // style={{ backgroundImage: `url('${backgroundim}')` }}
   return (
     <Layout style={{ backgroundImage: `url('${backgroundim}')` }}>
       {matchData.map((match, index) => {
         if (match.CompetitiveMovement !== "MOVEMENT_UNKNOWN") {
-          let progress, status;
+          let progress;
           if (match.CompetitiveMovement === "DEMOTED") {
-            status = "DEMOTED";
             progress =
               match.TierProgressAfterUpdate -
               match.TierProgressBeforeUpdate -
               100;
           } else if (match.CompetitiveMovement === "PROMOTED") {
-            status = "PROMOTED";
             progress =
               100 -
               match.TierProgressBeforeUpdate +
               match.TierProgressAfterUpdate;
           } else {
             progress =
-              match.TierProgressBeforeUpdate - match.TierProgressAfterUpdate;
+              match.TierProgressAfterUpdate - match.TierProgressBeforeUpdate;
           }
           const mapArray = match.MapID.split("/");
           const map = mapArray[mapArray.length - 1];
           const mapLink = `./${map}.png`;
+          const bgColor = progress > 0 ? "#a3cfec" : "#e2b6b3";
           return (
             <Card
               style={{
                 width: "50%",
-                backgroundImage: "url(" + assetsPath(mapLink).default + ")",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-                backgroundSize: "cover",
+                backgroundColor: bgColor,
+                // backgroundImage: "url(" + assetsPath(mapLink).default + ")",
+                // backgroundRepeat: "no-repeat",
+                // backgroundPosition: "center",
+                // backgroundSize: "cover",
               }}
-              key={index}
+              bordered={false}
+              key={match.MatchStartTime}
             >
               <div className="card-div">
                 <Image
@@ -61,15 +61,30 @@ const Matches = (props) => {
                     ).default
                   }
                 />
-                <p>
+                <div>
                   {progress > 0 ? (
-                    <span style={{ color: "green" }}>+{progress} WIN</span>
+                    <span style={{ color: "green" }}>+{progress} LP </span>
                   ) : (
-                    <span style={{ color: "red" }}>{progress} LOSE</span>
+                    <span style={{ color: "red" }}>{progress} LP </span>
                   )}
-                  {status ? <span className="status">({status})</span> : ""}
-                </p>
-                <p>{maps[map]}</p>
+                  {/* {status ? <span className="status">({status})</span> : ""} */}
+                  <Image
+                    preview={false}
+                    width={15}
+                    src={
+                      assetsPath(
+                        `./TX_CompetitiveTierMovement_${match.CompetitiveMovement}.png`
+                      ).default
+                    }
+                  />
+                </div>
+              </div>
+              <div className="card-div-second">
+                <Image
+                  preview={false}
+                  src={assetsPath(`./${map}.png`).default}
+                ></Image>
+                <div className="map-name">{maps[map]}</div>
               </div>
             </Card>
           );

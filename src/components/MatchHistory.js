@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import React, { Suspense } from "react";
+import { Button } from "antd";
 import backgroundim from "../images/valbg.png";
 const Matches = React.lazy(() => import("./Matches"));
 
@@ -8,13 +9,13 @@ const MatchHistory = (props) => {
   const [matchData, setMatchData] = useState([]);
   const { userData } = props;
 
-  useEffect(() => {
-    //console.log({ userData });
-    var data = JSON.stringify({
+  function getMatchData() {
+    var data = {
       user_token: localStorage.getItem("user_token"), //userData.user_token,
       entitlements_token: localStorage.getItem("entitlements_token"), //userData.entitlements_token,
       sub: localStorage.getItem("sub"), //userData.sub,
-    });
+      region: localStorage.getItem("region"), //userData.region
+    };
     var config = {
       method: "post",
       url: "http://localhost:4000/getuserhistory",
@@ -33,6 +34,14 @@ const MatchHistory = (props) => {
         );
       })
       .catch((error) => console.error(error));
+  }
+
+  const handleClick = (evt) => {
+    getMatchData();
+  };
+
+  useEffect(() => {
+    getMatchData();
   }, []);
 
   return matchData.length > 0 ? (
@@ -45,21 +54,24 @@ const MatchHistory = (props) => {
         backgroundSize: "cover",
       }}
     >
-      {console.log(matchData)}
-      <h1>{userData.game_name}</h1>
+      <h1>
+        {userData.game_name}#{userData.tag_line}
+      </h1>
       <h1>
         Current LP {matchData[0].TierProgressAfterUpdate} / Current MMR{" "}
         {matchData[0].TierAfterUpdate * 100 -
           300 +
           matchData[0].TierProgressAfterUpdate}
       </h1>
+      <Button type="primary" onClick={handleClick}>
+        Refresh
+      </Button>
       <Suspense fallback={<div>Loading data...</div>}>
         <Matches matchData={matchData} />
-        {/* <div>{JSON.stringify(matchData)}</div> */}
       </Suspense>
     </div>
   ) : (
-    <div>Loading...</div>
+    <div>Loading match data...</div>
   );
 };
 

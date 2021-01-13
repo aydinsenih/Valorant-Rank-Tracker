@@ -1,7 +1,7 @@
-import { Form, Input, Button, Row, Alert } from "antd";
+import { Form, Input, Button, Row, Alert, Select } from "antd";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 const Login = (props) => {
@@ -11,18 +11,16 @@ const Login = (props) => {
   const [loginError, setLoginError] = useState("");
 
   useEffect(() => {
-    const loginData = isLoggedIn();
-    console.log(loginData);
-    if (loginData) {
-      login(loginData);
+    if (isLoggedIn) {
+      login(isLoggedIn);
     }
-  }, []);
+  }, [isLoggedIn]);
 
-  const login = (loginDetails) => {
-    const data = JSON.stringify({
+  const login = useCallback((loginDetails) => {
+    const data = {
       username: loginDetails.username,
       password: loginDetails.password,
-    });
+    };
     var config = {
       method: "post",
       url: "http://localhost:4000/getuserinfo",
@@ -31,6 +29,7 @@ const Login = (props) => {
       },
       data: data,
     };
+
     axios(config)
       .then((res) => {
         setUserData(res.data.response);
@@ -42,10 +41,11 @@ const Login = (props) => {
         localStorage.setItem("sub", res.data.response.sub);
         localStorage.setItem("username", loginDetails.username);
         localStorage.setItem("password", loginDetails.password);
+        localStorage.setItem("region", loginDetails.region);
         history.push("/matchhistory");
       })
       .catch((err) => setLoginError("Username and Password is incorrect!"));
-  };
+  }, []);
 
   const onChange = (evt) => {};
 
@@ -80,7 +80,7 @@ const Login = (props) => {
     wrapperCol: {
       lg: {
         span: 15,
-        offset: 4,
+        offset: 0,
       },
       xs: {
         span: 12,
@@ -93,7 +93,7 @@ const Login = (props) => {
     },
   };
 
-  return (
+  return isLoggedIn === {} || isLoggedIn === false ? (
     <Row type="flex" justify="center" align="middle">
       <Form
         {...formItemLayout}
@@ -101,7 +101,13 @@ const Login = (props) => {
         name="login"
         onFinish={onSubmit}
       >
-        <h1>Welcome Back</h1>
+        <h1>Welcome to ValTracker</h1>
+        <Alert
+          style={{ marginBottom: 24 }}
+          message="Valorant Rank Tracker(aka. ValTracker) does NOT and will NOT store any of your data."
+          type="info"
+          showIcon
+        />
         {loginError && (
           <Alert
             style={{ marginBottom: 24 }}
@@ -144,6 +150,22 @@ const Login = (props) => {
             prefix={<LockOutlined />}
           />
         </Form.Item>
+        <Form.Item
+          name="region"
+          rules={[
+            {
+              required: true,
+              message: "please select your region!",
+            },
+          ]}
+        >
+          <Select style={{ width: 120 }}>
+            <Select.Option value="NA">North America</Select.Option>
+            <Select.Option value="EU">Europe</Select.Option>
+            <Select.Option value="AP">Asia Pacific</Select.Option>
+            <Select.Option value="KO">Korea</Select.Option>
+          </Select>
+        </Form.Item>
         <Form.Item {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit">
             Login
@@ -151,6 +173,8 @@ const Login = (props) => {
         </Form.Item>
       </Form>
     </Row>
+  ) : (
+    <h1>Loading... Please Wait...</h1>
   );
 };
 
